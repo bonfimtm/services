@@ -1,6 +1,15 @@
 const cors = require('cors')
 const express = require('express');
 const https = require('https');
+const admin = require('firebase-admin');
+
+const firebaseMonacoCredentials = JSON.parse(process.env.FIREBASE_MONACO_CREADENTIALS || "");
+
+admin.initializeApp({
+    credential: admin.credential.cert(firebaseMonacoCredentials)
+});
+
+const db = admin.firestore();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,6 +30,24 @@ const mayorCorsOptions = cors(getCorsOptions(mayorCorsWhitelist));
 
 app.get('/', (request, response) => {
     response.send('Welcome!');
+});
+
+app.options('/monaco/*', albertCorsOptions);
+
+app.get('/monaco/driving_requests', (request, response) => {
+    db.collection('driving_requests').doc('current').get()
+        .then(doc => {
+            if (!doc.exists) {
+                console.error('Document not found!');
+            } else {
+                const docData = doc.data()
+                console.log('Document data:', docData);
+                response.send(docData);
+            }
+        })
+        .catch(err => {
+            console.error('Error getting document', err);
+        });
 });
 
 app.options('/albert/*', albertCorsOptions);
@@ -44,7 +71,7 @@ app.get('/mayor/instagram/feed', mayorCorsOptions, (request, response) => {
 });
 
 app.listen(port, _ => {
-    console.log(`Listening on ${ port }`);
+    console.log(`Listening on ${port}`);
 });
 
 function getCorsOptions(corsWhitelist) {
