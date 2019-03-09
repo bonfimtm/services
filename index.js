@@ -42,7 +42,20 @@ app.get('/monaco/driving_requests', (request, response) => {
             } else {
                 const docData = doc.data()
                 console.log('Document data:', docData);
-                response.send(docData);
+
+                const arrayBuffer = new ArrayBuffer(2);
+                const buffer = Buffer.from(arrayBuffer);
+                const view = new Int8Array(arrayBuffer);
+
+                view[0] = docData.steering;
+                view[1] = docData.powertrain;
+
+                console.log('Array buffer:', arrayBuffer);
+                console.log('Buffer:', buffer);
+                console.log('View:', view);
+
+                response.contentType('application/octet-stream');
+                response.send(buffer);
             }
         })
         .catch(err => {
