@@ -43,9 +43,9 @@ app.get('/monaco/driving_requests', (request, response) => {
                 const docData = doc.data()
                 console.log('Document data:', docData);
 
-                const arrayBuffer = new ArrayBuffer(2);
+                const arrayBuffer = new ArrayBuffer(8);
                 const buffer = Buffer.from(arrayBuffer);
-                const view = new Int8Array(arrayBuffer);
+                const view = new Float32Array(arrayBuffer);
 
                 view[0] = docData.steering;
                 view[1] = docData.powertrain;
