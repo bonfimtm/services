@@ -2,6 +2,7 @@ const cors = require('cors')
 const express = require('express');
 const https = require('https');
 const admin = require('firebase-admin');
+const fs = require('fs');
 
 const firebaseMonacoCredentials = JSON.parse(process.env.FIREBASE_MONACO_CREADENTIALS || "");
 
@@ -12,7 +13,12 @@ admin.initializeApp({
 const db = admin.firestore();
 
 const app = express();
+
 const port = process.env.PORT || 80;
+const sslPort = process.env.SSL_PORT || 443;
+
+const privateKey = fs.readFileSync(process.env.PRIVATE_KEY || '../keys/server.key').toString();
+const certificate = fs.readFileSync(process.env.CERTIFICATE || '../keys/server.crt').toString();
 
 const baseUrl = 'https://api.instagram.com/v1/users/self';
 
@@ -84,7 +90,14 @@ app.get('/mayor/instagram/feed', mayorCorsOptions, (request, response) => {
 });
 
 app.listen(port, _ => {
-    console.log(`Listening on ${port}`);
+    console.log(`Listening HTTP on ${port}`);
+});
+
+https.createServer({
+    key: privateKey,
+    cert: certificate,
+}, app).listen(sslPort, _ => {
+    console.log(`Listening HTTPS on ${sslPort}`);
 });
 
 function getCorsOptions(corsWhitelist) {
