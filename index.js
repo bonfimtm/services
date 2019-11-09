@@ -14,8 +14,8 @@ const db = admin.firestore();
 
 const app = express();
 
-const port = process.env.PORT || 80;
-const sslPort = process.env.SSL_PORT || 443;
+const port = process.env.PORT || 4200;
+const sslPort = process.env.SSL_PORT || 4443;
 
 const privateKey = fs.readFileSync(process.env.PRIVATE_KEY || '../keys/server.key').toString();
 const certificate = fs.readFileSync(process.env.CERTIFICATE || '../keys/server.crt').toString();
